@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th= "http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head th:fragment="head(title)" >
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:replace="${title}">博客详情</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+    <link rel="stylesheet" href="../static/css/typo.css" th:href="@{/css/typo.css}">
+    <link rel="stylesheet" href="../static/css/animate.css" th:href="@{/css/animate.css}">
+    <link rel="stylesheet" href="../static/lib/prism/prism.css" th:href="@{/lib/prism/prism.css}">
+    <link rel="stylesheet" href="../static/lib/prism/prism.css" th:href="@{/lib/prism/prism.css}">
+    <link rel="stylesheet" href="../static/css/me.css" th:href="@{/css/me.css}">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+
+<!--导航-->
+<nav th:fragment="menu(n)" class="ui inverted attached segment m-padded-tb-mini m-shadow-small" >
+    <div class="ui container">
+        <div class="ui inverted secondary stackable menu">
+            <h2 class="ui teal header item">Blog</h2>
+            <a href="#" th:href="@{/}" class=" m-item item m-mobile-hide" th:classappend="${n == 1} ? 'active'"><i class=" home icon"></i>[[#{index.home}]]</a>
+            <a href="#" class="m-item item m-mobile-hide" th:href="@{/type?id=-1}" th:classappend="${n == 2} ? 'active'"><i class=" idea icon"></i>[[#{index.category}]]</a>
+            <a href="#" class="m-item item m-mobile-hide" th:href="@{/tag?id=-1}" th:classappend="${n == 3} ? 'active'"><i class=" tags icon"></i>[[#{index.tag}]]</a>
+            <a href="#" class="m-item item m-mobile-hide" th:href="@{/archives}" th:classappend="${n == 4} ? 'active'"><i class=" clone icon"></i>[[#{index.archives}]]</a>
+            <a href="#" class="m-item item m-mobile-hide" th:href="@{/aboutMe}" th:classappend="${n == 5} ? 'active'"><i class=" info icon"></i>[[#{index.about}]]</a>
+            <div class="right m-item item m-mobile-hide">
+                    <div class="ui icon inverted transparent input m-margin-tb-tiny">
+                        <input type="text" name="query" id="query" placeholder="Search...." th:value="${query != null} ? ${query}">
+                        <button type="submit" class="btn btn-secondary btn-lg" onclick="searchBlog()">[[#{index.search}]]</button>
+                    </div>
+            </div>
+
+            <script >
+                function searchBlog() {
+                    let query = $("#query").val();
+                    if(query != null && "" != query){
+                        location.href="/search?query="+query;
+                    }
+                }
+            </script>
+
+            <!--未登录-->
+            <div style="position: absolute;right: 0;bottom:15px" sec:authorize="!isAuthenticated()">
+                <a  class="ui blue button" href="/login.html" th:href="@{/login}" >[[#{index.login}]]</a>
+                <a class="ui green button" th:href="@{/register}">[[#{index.register}]]</a>
+            </div>
+
+            <!--已登录-->
+            <div style="position: absolute;right: 0;bottom:15px" sec:authorize="isAuthenticated()">
+                <a  class="ui blue button" href="#" sec:authentication="name"></a>
+                <a class="ui green button" th:href="@{/logout}">[[#{index.logout}]]</a>
+            </div>
+
+        </div>
+    </div>
+    <a href="#" class="ui menu toggle black icon button m-right-top m-mobile-show">
+        <i class="sidebar icon"></i>
+    </a>
+</nav>
+
+
+<!--底部footer-->
+<footer th:fragment="footer" class="ui inverted vertical segment m-padded-tb-massive">
+    <div class="ui center aligned container">
+        <div class="ui inverted divided stackable grid">
+            <div class="three wide column">
+                <div class="ui inverted link list">
+                    <div class="item">
+                        <img src="../static/images/wechat.jpg" th:src="@{/images/wechat.jpg}" class="ui rounded image" alt="" style="width: 110px">
+                    </div>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced " >最新博客</h4>
+                <div class="ui inverted link list">
+                    <a href="#" class="item m-text-thin">用户故事（User Story）</a>
+                    <a href="#" class="item m-text-thin">用户故事（User Story）</a>
+                    <a href="#" class="item m-text-thin">用户故事（User Story）</a>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced " th:text="#{index.msg}">联系我</h4>
+                <div class="ui inverted link list">
+                    <a href="#" class="item m-text-thin" th:text="#{index.email}">Email：nzpq@foxmail.com</a>
+                    <a href="#" class="item m-text-thin" th:text="#{index.qq}">QQ：2660047409</a>
+                </div>
+            </div>
+            <div class="seven wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced ">Blog</h4>
+                <p class="m-text-thin m-text-spaced m-opacity-mini" th:text="#{index.content}">这是我的个人博客、会分享关于编程、写作、思考相关的任何内容，希望可以给来到这儿的人有所帮助...</p>
+            </div>
+        </div>
+        <div class="ui inverted section divider"></div>
+        <p class="m-text-thin m-text-spaced m-opacity-tiny">Copyright © 1999 - 2020 Designed by NZP</p>
+    </div>
+</footer>
+
+<th:block th:fragment="js">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
+    <script src="../static/lib/prism/prism.js" th:src="@{/lib/prism/prism.js}"></script>
+    <script src="../static/lib/tocbot/tocbot.min.js" th:src="@{/lib/tocbot/tocbot.min.js}"></script>
+    <script src="../static/lib/qrcode/qrcode.min.js" th:src="@{/lib/qrcode/qrcode.min.js}"></script>
+    <script src="../static/lib/waypoints/jquery.waypoints.min.js" th:src="@{/lib/waypoints/jquery.waypoints.min.js}"></script>
+</th:block>
+</body>
+</html>

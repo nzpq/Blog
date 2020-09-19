@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nzpq.blog.mapper.admin.TagMapper">
+
+    <select id="listTag" resultType="tag" >
+        SELECT * FROM t_tag ORDER BY id
+    </select>
+
+    <insert id="saveTag" parameterType="tag" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_tag(id,name) VALUES (#{id},#{name})
+    </insert>
+
+    <select id="getTagByName" parameterType="String" resultType="tag">
+         SELECT * FROM t_tag WHERE name = #{name}
+    </select>
+
+    <select id="getTag" parameterType="Long" resultType="tag">
+         SELECT * FROM t_tag WHERE id = #{id}
+    </select>
+
+    <update id="updateTag" parameterType="tag">
+        UPDATE t_tag SET name = #{name} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteTag" parameterType="Long">
+        DELETE FROM t_tag WHERE id = #{id}
+    </delete>
+
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nzpq.blog.mapper.admin.TypeMapper">
+
+<!--    <resultMap id="userMap" type="userInfo">-->
+<!--        <id property="id" column="id"></id>-->
+<!--        <result property="nickName" column="nickName"></result>-->
+<!--        <result property="username" column="username"></result>-->
+<!--        <result property="password" column="password"></result>-->
+<!--        <result property="email" column="email"></result>-->
+<!--        <result property="avater" column="avater"></result>-->
+<!--        <result property="type" column="type"></result>-->
+<!--        <result property="createTime" column="createTime"></result>-->
+<!--        <result property="updateTime" column="updateTime"></result>-->
+<!--        <collection property="roles" ofType="role">-->
+<!--            <id property="id" column="rid"></id>-->
+<!--            <result property="roleName" column="roleName"></result>-->
+<!--        </collection>-->
+<!--    </resultMap>-->
+
+    <select id="listType" resultType="type" >
+        SELECT * FROM t_type ORDER BY id
+    </select>
+
+    <insert id="saveType" parameterType="type" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_type(id,name) VALUES (#{id},#{name})
+    </insert>
+
+    <select id="getTypeByName" parameterType="String" resultType="type">
+         SELECT * FROM t_type WHERE name = #{name} ORDER BY id
+    </select>
+
+    <select id="getType" parameterType="Long" resultType="type">
+         SELECT * FROM t_type WHERE id = #{id}
+    </select>
+
+    <update id="updateType" parameterType="type">
+        UPDATE t_type SET name = #{name} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteType" parameterType="Long">
+        DELETE FROM t_type WHERE id = #{id}
+    </delete>
+</mapper>

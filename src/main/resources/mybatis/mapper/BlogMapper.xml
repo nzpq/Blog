@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nzpq.blog.mapper.admin.BlogMapper">
+
+    <resultMap id="blogMap" type="blog">
+        <id column="id" property="id"></id>
+        <result column="title" property="title"></result>
+        <result column="content" property="content"></result>
+        <result column="first_picture" property="firstPicture"></result>
+        <result column="flag" property="flag"></result>
+        <result column="views" property="views"></result>
+        <result column="appreciation" property="appreciation"></result>
+        <result column="share_statement" property="shareStatement"></result>
+        <result column="commentabled" property="commentabled"></result>
+        <result column="recommend" property="recommend"></result>
+        <result column="description" property="description"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="update_time" property="updateTime"></result>
+        <result column="published" property="published"></result>
+        <association property="type" javaType="type">
+            <id column="tid" property="id"></id>
+            <result column="tname" property="name"></result>
+        </association>
+    </resultMap>
+
+    <select id="listBlog" resultMap="blogMap" parameterType="com.nzpq.blog.vo.BlogQuery">
+        SELECT blog.*,type.id  tid,type.name AS tname
+         FROM t_blog blog
+         JOIN t_type type
+         ON   blog.type_id = type.id
+        <where>
+
+            <if test="title != null and title != ''">
+                and title like concat('%',#{title},'%')
+            </if>
+
+            <if test="typeId != null">
+                and type_id = #{typeId}
+            </if>
+
+<!--            <if test="recommend == true">-->
+<!--                and recommend = true-->
+<!--            </if>-->
+<!--            <if test="recommend == false">-->
+<!--                and recommend = false-->
+<!--            </if>-->
+        </where>
+        ORDER BY blog.id
+    </select>
+
+    <insert id="saveBlog" parameterType="blog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        t_blog(id,appreciation,commentabled,content,create_time,description,first_picture,flag,published,recommend,share_statement,title,update_time,views,type_id,user_id)
+         VALUES (#{id},#{appreciation},#{commentabled},#{content},#{createTime},#{description},#{firstPicture},#{flag},#{published},#{recommend},#{shareStatement},#{title},#{updateTime},#{views},#{type.id},#{userInfo.id})
+    </insert>
+
+    <select id="getBlog" parameterType="Long" resultMap="blogMap">
+         SELECT blog.*,type.id  tid,type.name AS tname
+         FROM t_blog blog
+         JOIN t_type type
+         ON   blog.type_id = type.id
+         WHERE blog.id = #{id}
+    </select>
+
+    <update id="updateBlog" parameterType="blog">
+         UPDATE t_blog  SET appreciation = #{appreciation}, commentabled = #{commentabled},content = #{content}, description = #{description},
+         first_picture = #{firstPicture}, flag = #{flag}, published = #{published}, recommend = #{recommend}, share_statement = #{shareStatement},
+          title = #{title}, update_time = #{updateTime}, type_id = #{type.id}
+         WHERE id = #{id}
+    </update>
+
+    <delete id="deleteBlog" parameterType="Long">
+        DELETE FROM t_blog WHERE id = #{id}
+    </delete>
+
+    <insert id="addBlogTags" parameterType="Long">
+        INSERT INTO t_blog_tags(blogs_id,tags_id) VALUES (#{bid},#{tid})
+    </insert>
+
+    <delete id="deleteBlogTags" parameterType="Long">
+        DELETE FROM t_blog_tags WHERE blogs_id = #{id}
+    </delete>
+
+    <update id="updatePublished" parameterType="Long">
+        UPDATE t_blog SET published = true WHERE id = #{id}
+    </update>
+
+    <select id="findBlogTagsId" parameterType="Long" resultType="java.lang.Long">
+        SELECT tags_id FROM t_blog_tags where blogs_id = #{id}
+    </select>
+</mapper>

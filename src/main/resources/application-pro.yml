@@ -1,0 +1,44 @@
+# thyme leaf\u7981\u7528\u7F13\u5B58
+spring:
+  thymeleaf:
+    cache: false
+    mode: HTML
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8
+    data-username: root
+    data-password: 123456
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+logging:
+  level:
+    root: warn
+    com.nzpq: info
+  file:
+    name: log/blog-pro.log
+
+mybatis:
+#  config-location: classpath:mybatis/mybatis-config.xml # mybatis全局配置
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.nzpq.blog.pojo
+  configuration:
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
+    map-underscore-to-camel-case: true
+# 当reasonable:true时在pageNum<1会查询第一页，如果pageNum>pages会查询最后一页
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+# 首页显示的类型，标签，最新文章的数量
+size:
+  typeSize: 6
+  tagSize: 10
+  blogSize: 10
+
+comment:
+  avatar: /images/avatar.jpg

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nzpq.blog.mapper.IndexMapper">
+
+    <resultMap id="blogMap" type="blog">
+        <id column="id" property="id"></id>
+        <result column="title" property="title"></result>
+        <result column="content" property="content"></result>
+        <result column="first_picture" property="firstPicture"></result>
+        <result column="flag" property="flag"></result>
+        <result column="views" property="views"></result>
+        <result column="appreciation" property="appreciation"></result>
+        <result column="share_statement" property="shareStatement"></result>
+        <result column="commentabled" property="commentabled"></result>
+        <result column="recommend" property="recommend"></result>
+        <result column="description" property="description"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="update_time" property="updateTime"></result>
+        <result column="published" property="published"></result>
+
+        <association property="type" javaType="type" >
+            <id column="tid" property="id"></id>
+            <result column="tname" property="name"></result>
+        </association>
+        <association property="userInfo" javaType="UserInfo" >
+            <id column="uid" property="id"></id>
+            <result column="nickname" property="nickName"></result>
+            <result column="avatar" property="avatar"></result>
+        </association>
+        <collection property="tags" ofType="tag" >
+            <id property="id" column="tagId"></id>
+            <result property="name" column="tagName"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="typeMap" type="type">
+        <id column="tid" property="id"></id>
+        <result column="tname" property="name"></result>
+        <collection property="blogs" ofType="blog">
+            <id column="id" property="id"></id>
+            <result column="title" property="title"></result>
+            <result column="content" property="content"></result>
+            <result column="first_picture" property="firstPicture"></result>
+            <result column="flag" property="flag"></result>
+            <result column="views" property="views"></result>
+            <result column="appreciation" property="appreciation"></result>
+            <result column="share_statement" property="shareStatement"></result>
+            <result column="commentabled" property="commentabled"></result>
+            <result column="recommend" property="recommend"></result>
+            <result column="description" property="description"></result>
+            <result column="create_time" property="createTime"></result>
+            <result column="update_time" property="updateTime"></result>
+            <result column="published" property="published"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="tagMap" type="tag">
+        <id column="tid" property="id"></id>
+        <result column="tname" property="name"></result>
+        <collection property="blogs" ofType="blog">
+            <id column="id" property="id"></id>
+            <result column="title" property="title"></result>
+            <result column="content" property="content"></result>
+            <result column="first_picture" property="firstPicture"></result>
+            <result column="flag" property="flag"></result>
+            <result column="views" property="views"></result>
+            <result column="appreciation" property="appreciation"></result>
+            <result column="share_statement" property="shareStatement"></result>
+            <result column="commentabled" property="commentabled"></result>
+            <result column="recommend" property="recommend"></result>
+            <result column="description" property="description"></result>
+            <result column="create_time" property="createTime"></result>
+            <result column="update_time" property="updateTime"></result>
+            <result column="published" property="published"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="showTypeMap" type="blog">
+        <id column="id" property="id"></id>
+        <result column="title" property="title"></result>
+        <result column="content" property="content"></result>
+        <result column="first_picture" property="firstPicture"></result>
+        <result column="views" property="views"></result>
+        <result column="description" property="description"></result>
+        <result column="update_time" property="updateTime"></result>
+
+        <association property="type" javaType="type" >
+            <id column="tid" property="id"></id>
+            <result column="tname" property="name"></result>
+        </association>
+    </resultMap>
+
+    <resultMap id="showTagMap" type="blog">
+        <id column="id" property="id"></id>
+        <result column="title" property="title"></result>
+        <result column="content" property="content"></result>
+        <result column="first_picture" property="firstPicture"></result>
+        <result column="views" property="views"></result>
+        <result column="description" property="description"></result>
+        <result column="update_time" property="updateTime"></result>
+
+        <collection property="tags" ofType="tag" >
+            <id column="tid" property="id"></id>
+            <result column="tname" property="name"></result>
+        </collection>
+    </resultMap>
+
+    <select id="listBlog" resultMap="blogMap" parameterType="String">
+        SELECT blog.*,type.id  tid,type.name AS tname,user.id AS uid,user.nickname,user.avatar
+        FROM t_blog blog
+        JOIN t_type type
+        ON   blog.type_id = type.id
+        JOIN t_user user
+        ON blog.user_id = user.id
+        WHERE blog.published = true
+        <if test="query != null and query != ''">
+            AND blog.title LIKE concat('%',#{query},'%') OR blog.content LIKE concat('%',#{query},'%')
+        </if>
+        ORDER BY blog.update_time DESC
+    </select>
+
+    <select id="getBlog" parameterType="Long" resultMap="blogMap">
+        SELECT tag.id AS tagId,tag.name AS tagName,type.id tid,type.name AS tname,user.id AS uid,user.nickname,user.avatar, blog.*
+        FROM t_blog blog
+        LEFT JOIN t_type type
+        ON   blog.type_id = type.id
+        LEFT JOIN t_user user
+        ON blog.user_id = user.id
+        LEFT JOIN t_blog_tags
+        ON t_blog_tags .blogs_id = blog.id
+        LEFT JOIN t_tag tag
+        ON t_blog_tags.tags_id = tag.id
+         WHERE blog.published = true
+         AND blog.id = #{id}
+    </select>
+
+    <select id="listTypes" parameterType="Integer" resultMap="typeMap">
+        SELECT type.id AS tid,type.name AS tname,blog.*
+        FROM (
+        SELECT * FROM t_type
+        <if test="size != null">
+            limit #{size}
+        </if>
+
+        ) AS type
+        LEFT JOIN (SELECT * FROM t_blog WHERE t_blog.published = true)  blog
+        ON blog.type_id = type.id
+    </select>
+
+    <select id="listTags" parameterType="Integer" resultMap="tagMap">
+        SELECT tag.id AS tid,tag.name AS tname,blog.*
+        FROM (
+        SELECT * FROM t_tag
+            <if test="size != null">
+                limit #{size}
+            </if>
+        ) tag
+        LEFT JOIN t_blog_tags bt
+        ON tag.id = bt.tags_id
+        LEFT JOIN (SELECT * FROM t_blog WHERE t_blog.published = true) blog
+        ON blog.id = bt.blogs_id
+    </select>
+
+    <select id="getTopBlogs" resultType="blog" parameterType="Integer">
+        SELECT * FROM t_blog  WHERE t_blog.published = true ORDER BY views DESC ,id DESC LIMIT #{size}
+    </select>
+
+    <update id="updateView" parameterType="blog">
+            UPDATE t_blog SET t_blog.views = #{views} WHERE id = #{id}
+    </update>
+
+    <select id="getByTypeId" resultMap="showTypeMap">
+        SELECT type.id tid, type.name tname,blog.id,blog.content,blog.title,blog.description,blog.update_time,blog.views,blog.first_picture
+        FROM t_blog blog
+        JOIN t_type type
+        ON blog.type_id = type.id
+        where type_id = #{id} AND blog.published IS true
+    </select>
+
+    <select id="getByTagId" resultMap="showTagMap">
+        SELECT tag.id AS tid,tag.name AS tname,blog.id,blog.content,blog.title,blog.description,blog.update_time,blog.views,blog.first_picture
+        FROM t_tag tag
+        LEFT JOIN t_blog_tags bt
+        ON tag.id = bt.tags_id
+        JOIN t_blog blog
+        ON blog.id = bt.blogs_id
+        WHERE tag.id = #{id} AND blog.published = true
+    </select>
+
+    <select id="findGroupYear" resultType="String">
+        SELECT DATE_FORMAT(blog.update_time,'%Y') AS year
+        FROM t_blog blog
+        WHERE blog.published IS true
+        GROUP BY year
+        ORDER BY year DESC
+    </select>
+
+    <select id="findByYear" resultType="blog" parameterType="String">
+        SELECT blog.id,blog.title,blog.flag,blog.update_time
+        FROM t_blog blog
+        WHERE blog.published IS true AND DATE_FORMAT(blog.update_time,'%Y') = #{year}
+    </select>
+
+    <select id="findTotalBlog" resultType="Long">
+        SELECT count(*) FROM t_blog WHERE t_blog.published IS true
+    </select>
+</mapper>

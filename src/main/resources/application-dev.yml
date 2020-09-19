@@ -1,0 +1,75 @@
+
+# thyme leaf\u7981\u7528\u7F13\u5B58
+spring:
+  thymeleaf:
+    cache: false
+    mode: HTML
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false&serverTimezone=GMT%2B8
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+  messages:
+    basename: i18n.messages
+      #   数据源其他配置
+#    initialSize: 5
+#    minIdle: 5
+#    maxActive: 20
+#    maxWait: 60000
+#    timeBetweenEvictionRunsMillis: 60000
+#    minEvictableIdleTimeMillis: 300000
+#    validationQuery: SELECT 1 FROM DUAL
+#    testWhileIdle: true
+#    testOnBorrow: false
+#    testOnReturn: false
+#    poolPreparedStatements: true
+#    maxPoolPreparedStatementPerConnectionSize: 20
+#    useGlobalDataSourceStat: true
+#    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+
+    # 解决post表单中put方式无法提交
+    # 因为注解@ConditionalOnProperty限制了自动配置，默认false不开启配置，所以页面的put提交无法使用。
+    # 解决办法： yml配置文件中配置，使之开启自动配置： spring.mvc.hiddenmethod.filter.enabled=true
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+logging:
+  level:
+    root: info
+    com.nzpq: debug
+  #file:
+   # name: log/blog-dev.log
+
+mybatis:
+#  config-location: classpath:mybatis/mybatis-config.xml # mybatis全局配置
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.nzpq.blog.pojo
+  configuration:
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
+    map-underscore-to-camel-case: true
+
+# 当reasonable:true时在pageNum<1会查询第一页，如果pageNum>pages会查询最后一页
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+# 首页显示的类型，标签，最新文章的数量
+size:
+  typeSize: 6
+  tagSize: 10
+  blogSize: 10
+
+comment:
+  avatar: /images/avatar.jpg
+
+server:
+  port: 80

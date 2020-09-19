@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nzpq.blog.mapper.CommentMapper">
+
+    <resultMap id="commentMap" type="comment">
+        <id column="id" property="id"></id>
+        <result column="admin_comment" property="adminComment"></result>
+        <result column="avatar" property="avatar"></result>
+        <result column="content" property="content"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="email" property="email"></result>
+        <result column="nickname" property="nickName"></result>
+        <result column="blog_id" property="blog.id"></result>
+        <result column="parent_comment_id" property="parentComment.id"></result>
+        <collection property="replyComments" ofType="comment">
+            <id column="cid" property="id"></id>
+            <result column="c_admin_comment" property="adminComment"></result>
+            <result column="cavater" property="avatar"></result>
+            <result column="ccontent" property="content"></result>
+            <result column="c_create_time" property="createTime"></result>
+            <result column="cemail" property="email"></result>
+            <result column="c_blog_id" property="blog.id"></result>
+            <result column="cnickname" property="nickName"></result>
+        </collection>
+    </resultMap>
+
+    <select id="getCommentsByBlogId" resultMap="commentMap" parameterType="Long">
+        SELECT t1.*,
+            t2.id cid,t2.admin_comment c_admin_comment,t2.avatar cavater,t2.content ccontent,t2.create_time c_create_time,t2.email cemail,
+            t2.blog_id c_blog_id,t2.nickname cnickname
+        FROM (SELECT * FROM t_comment WHERE parent_comment_id IS NULL) t1
+        LEFT JOIN t_comment t2
+        ON t2.parent_comment_id = t1.id
+         WHERE t1.blog_id= #{id}
+         ORDER BY create_time DESC
+    </select>
+
+    <insert id="saveComments" parameterType="comment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_comment(id,nickName,email,content,avatar,create_time,parent_comment_id,admin_comment,blog_id)
+         VALUES(#{id},#{nickName},#{email},#{content},#{avatar},#{createTime},#{parentComment.id},#{adminComment},#{blog.id})
+    </insert>
+
+<select id="findOne" resultType="comment" parameterType="Long">
+    SELECT * FROM t_comment WHERE id= #{id}
+</select>
+
+</mapper>
